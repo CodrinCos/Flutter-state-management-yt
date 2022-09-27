@@ -15,7 +15,7 @@ void main() {
         ),
         home: const HomePage(),
         routes: {
-          '/new': (context) => const Material(),
+          '/new': (context) => const NewBreadCrumbWidget(),
         },
       ),
     ),
@@ -54,7 +54,9 @@ class BreadCrumbProvider extends ChangeNotifier {
     for (final item in _items) {
       item.activate();
     }
+
     _items.add(breadCrumb);
+
     notifyListeners();
   }
 
@@ -64,7 +66,10 @@ class BreadCrumbProvider extends ChangeNotifier {
   }
 }
 
+// typedef OnBreadCrumbTapped = void Function(BreadCrumb);
+
 class BreadCrumbsWidget extends StatelessWidget {
+  // final OnBreadCrumbTapped onTapped;
   final UnmodifiableListView<BreadCrumb> breadCrumbs;
   const BreadCrumbsWidget({super.key, required this.breadCrumbs});
 
@@ -72,10 +77,15 @@ class BreadCrumbsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Wrap(
       children: breadCrumbs.map((breadCrumb) {
-        return Text(
-          breadCrumb.title,
-          style: TextStyle(
-            color: breadCrumb.isActive ? Colors.blue : Colors.amber,
+        return GestureDetector(
+          onTap: () {
+            // onTapped(breadCrumb);
+          },
+          child: Text(
+            breadCrumb.title,
+            style: TextStyle(
+              color: breadCrumb.isActive ? Colors.blue : Colors.amber,
+            ),
           ),
         );
       }).toList(),
@@ -163,14 +173,15 @@ class _NewBreadCrumbWidgetState extends State<NewBreadCrumbWidget> {
         TextButton(
           onPressed: () {
             final text = _controller.text;
-            if (text.isEmpty) {
+            if (text.isNotEmpty) {
               final breadCrumb = BreadCrumb(
                 isActive: false,
                 name: text,
               );
+
+              context.read<BreadCrumbProvider>().add(breadCrumb);
+              Navigator.of(context).pop();
             }
-            context.read<BreadCrumbProvider>().add(breadCrumb);
-            Navigator.of(context).pop();
           },
           child: const Text('Add'),
         ),
